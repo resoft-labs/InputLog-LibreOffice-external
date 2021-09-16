@@ -1,6 +1,6 @@
 # LibreOffice-external
 
-Simple example standalone application capable of doing there things (in this order): 
+Simple example standalone application capable of doing these things (in this order): 
 
 - Start a libreoffice with the correct command line to allow remote access
 - Start a logging session using this libreoffice
