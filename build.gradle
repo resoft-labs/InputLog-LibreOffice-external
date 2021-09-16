@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'eclipse'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile 'org.libreoffice:officebean:6.4.3'
+    compile 'org.libreoffice:ridl:6.4.3'    
+    compile 'org.libreoffice:jurt:6.4.3'
+    compile 'org.libreoffice:juh:6.4.3'
+    compile 'org.libreoffice:unoil:6.4.3'
+    compile 'org.libreoffice:unoloader:6.4.3'
+
+    compile 'org.slf4j:slf4j-api:1.7.21'
+    compile 'com.google.guava:guava:17.0'
+}
+
+version = '0.0.1'
+
+task copyRuntimeLibs(type: Copy) {
+    into "lib"
+    from configurations.runtime
+}
+
+
