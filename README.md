@@ -11,7 +11,7 @@ Simple example standalone application capable of doing these things (in this ord
 - checkout the code
 - compile using gradle: `./gradlew build`
 
-This should result in all necessasry jars ending up in `lib`.
+This should result in all necessary jars ending up in `lib`.
 
 Run like this: 
 
