@@ -1,251 +1,154 @@
 package test;
 
-import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.bridge.XBridge;
 import com.sun.star.bridge.XBridgeFactory;
 import com.sun.star.comp.helper.Bootstrap;
 import com.sun.star.connection.XConnection;
 import com.sun.star.connection.XConnector;
-import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XDesktop;
 import com.sun.star.frame.XDispatchHelper;
 import com.sun.star.frame.XDispatchProvider;
-import com.sun.star.frame.XFrame;
-import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
-public class Main {
+public class Main2 {
 
     private static final int SOCKET_PORT = 2002;
 
-    private static XComponent bridgeComponent = null;
-    private static XComponentContext xcc = null;
-    private static XMultiComponentFactory mcFactory;
-    private static XDesktop xDesktop = null;
-
-    public static <T> T qi(Class<T> aType, Object o) {
-        return UnoRuntime.queryInterface(aType, o);
-    }
-
-    public static <T> T createInstanceMCF(Class<T> aType, String serviceName, Object[] args) {
-        /*
-         * create an interface object of class aType from the named service and arguments; uses XComponentContext and 'new' XMultiComponentFactory so only a
-         * bridge to office is needed
-         */
-        T interfaceObj = null;
+    private static void dispatch(String command) {
         try {
-            Object o = mcFactory.createInstanceWithArgumentsAndContext(serviceName, args, xcc);
-            // create service component using the specified args and component context
-            interfaceObj = qi(aType, o);
-            // uses bridge to obtain proxy to remote interface inside service;
-            // implements casting across process boundaries
-        } catch (Exception e) {
-            System.out.println("Couldn't create interface for \"" + serviceName + "\": " + e);
-        }
-        return interfaceObj;
-    } // end of createInstanceMCF()
-
-    public static <T> T createInstanceMCF(Class<T> aType, String serviceName) {
-        /*
-         * create an interface object of class aType from the named service; uses XComponentContext and 'new' XMultiComponentFactory so only a bridge to office
-         * is needed
-         */
-        T interfaceObj = null;
-        try {
-            Object o = mcFactory.createInstanceWithContext(serviceName, xcc);
-            // create service component using the specified component context
-            interfaceObj = qi(aType, o);
-            // uses bridge to obtain proxy to remote interface inside service;
-            // implements casting across process boundaries
-        } catch (Exception e) {
-            System.out.println("Couldn't create interface for \"" + serviceName + "\": " + e);
-        }
-        return interfaceObj;
-    } // end of createInstanceMCF()
-
-    private static XComponentContext socketContext() {
-        // use socket connection to Office
-        // https://forum.openoffice.org/en/forum/viewtopic.php?f=44&t=1014
-
-        XComponentContext xcc = null; // the remote office component context
-
-        try {
-            /*
-             * String[] cmdArray = new String[3]; cmdArray[0] = "soffice"; // requires soffice to be in Windows PATH env var. cmdArray[1] = "-headless";
-             * cmdArray[2] = "-accept=socket,host=localhost,port=" + SOCKET_PORT + ";urp;";
-             * 
-             * Process p = Runtime.getRuntime().exec(cmdArray);
-             * 
-             * if (p != null) { System.out.println("Office process created"); Thread.sleep(5000); } // Wait 5 seconds, until office is in listening mode
-             * 
-             */
+            // Step 1: Connect to office
+            System.out.println("Connecting to Office...");
 
             // Create a local Component Context
             XComponentContext localContext = Bootstrap.createInitialComponentContext(null);
 
-            // Get the local service manager
+            // Get a local service manager
             XMultiComponentFactory localFactory = localContext.getServiceManager();
 
-            // connect to Office via its socket
-            /*
-             * Object urlResolver = localFactory.createInstanceWithContext( "com.sun.star.bridge.UnoUrlResolver", localContext); XUnoUrlResolver xUrlResolver =
-             * Lo.qi(XUnoUrlResolver.class, urlResolver); Object initObject = xUrlResolver.resolve( "uno:socket,host=localhost,port=" + SOCKET_PORT +
-             * ";urp;StarOffice.ServiceManager");
-             */
-            XConnector connector = qi(XConnector.class, localFactory.createInstanceWithContext("com.sun.star.connection.Connector", localContext));
+            // Connect to office via a socket
+            XConnector connector = UnoRuntime.queryInterface(XConnector.class,
+                    localFactory.createInstanceWithContext("com.sun.star.connection.Connector", localContext));
+            XConnection connection = connector.connect("socket,host=localhost,port=" + SOCKET_PORT);
 
-            XConnection connection = connector.connect(
-                    "socket,host=localhost,port=" + SOCKET_PORT);
-
-            // create a bridge to Office via the socket
-            XBridgeFactory bridgeFactory = qi(XBridgeFactory.class, localFactory.createInstanceWithContext("com.sun.star.bridge.BridgeFactory", localContext));
-
-            // create a nameless bridge with no instance provider
+            // Create a bridge
+            XBridgeFactory bridgeFactory = UnoRuntime.queryInterface(XBridgeFactory.class,
+                    localFactory.createInstanceWithContext("com.sun.star.bridge.BridgeFactory", localContext));
             XBridge bridge = bridgeFactory.createBridge("socketBridgeAD", "urp", connection, null);
 
-            bridgeComponent = qi(XComponent.class, bridge);
+            // Get a remote service manager
+            XMultiComponentFactory serviceManager = UnoRuntime.queryInterface(XMultiComponentFactory.class, bridge.getInstance("StarOffice.ServiceManager"));
 
-            // get the remote service manager
-            XMultiComponentFactory serviceManager = qi(XMultiComponentFactory.class, bridge.getInstance("StarOffice.ServiceManager"));
-
-            // retrieve Office's remote component context as a property
-            XPropertySet props = qi(XPropertySet.class, serviceManager);
-            // initObject);
+            // Retrieve the remote component context as a property
+            XPropertySet props = UnoRuntime.queryInterface(XPropertySet.class, serviceManager);
             Object defaultContext = props.getPropertyValue("DefaultContext");
 
-            // get the remote interface XComponentContext
-            xcc = qi(XComponentContext.class, defaultContext);
+            // Retrieve the remote XComponentContext
+            XComponentContext remoteCC = UnoRuntime.queryInterface(XComponentContext.class, defaultContext);
+
+            if (remoteCC == null) {
+                System.err.println("Remote Component Context could not be created");
+                System.exit(1);
+            }
+
+            // Retrieve (remote) service Factory
+            XMultiComponentFactory remoteFactory = remoteCC.getServiceManager();
+
+            if (remoteFactory == null) {
+                System.err.println("Remote Service Manager is unavailable");
+                System.exit(1);
+            }
+
+            // Retrieve the (remote) desktop
+            XDesktop xDesktop = UnoRuntime.queryInterface(XDesktop.class, remoteFactory.createInstanceWithContext("com.sun.star.frame.Desktop", remoteCC));
+
+            if (xDesktop == null) {
+                System.err.println("Could not create a desktop service");
+                System.exit(1);
+            }
+
+            System.out.println("Connected...");
+
+            // Step 2: dispatch the call
+            System.out.println("Sending command to InputLog-LO: " + command);
+
+            XDispatchHelper helper = UnoRuntime.queryInterface(XDispatchHelper.class,
+                    remoteFactory.createInstanceWithContext("com.sun.star.frame.DispatchHelper", remoteCC));
+
+            if (helper == null) {
+                System.err.println("Could not create dispatch helper");
+                System.exit(1);
+            }
+
+            XDispatchProvider provider = UnoRuntime.queryInterface(XDispatchProvider.class, xDesktop.getCurrentFrame());
+            helper.executeDispatch(provider, command, "", 0, null);
+
+            // helper.executeDispatch(provider, ".uno:Close", "", 0, null);
+
+            System.out.println("Done...");
+
+            // TODO: proper cleanup?
+            System.exit(0);
+
         } catch (Exception e) {
-            System.out.println("Unable to socket connect to Office");
-        }
-
-        return xcc;
-    } // end of socketContext()
-
-    public static XComponentLoader connectToOffice() {
-        /*
-         * Creation sequence: remote component content (xcc) --> remote service manager (mcFactory) --> remote desktop (xDesktop) --> component loader
-         * (XComponentLoader) Once we have a component loader, we can load a document. xcc, mcFactory, and xDesktop are stored as static globals.
-         */
-        System.out.println("Loading Office...");
-
-        xcc = socketContext(); // connects to office via a socket
-
-        if (xcc == null) {
-            System.out.println("Office context could not be created");
+            System.err.println("Failed to stop InputLog-LO " + e);
+            e.printStackTrace(System.err);
             System.exit(1);
         }
-
-        // get the remote office service manager
-        mcFactory = xcc.getServiceManager();
-
-        if (mcFactory == null) {
-            System.out.println("Office Service Manager is unavailable");
-            System.exit(1);
-        }
-
-        // desktop service handles application windows and documents
-        xDesktop = createInstanceMCF(XDesktop.class, "com.sun.star.frame.Desktop");
-
-        if (xDesktop == null) {
-            System.out.println("Could not create a desktop service");
-            System.exit(1);
-        }
-
-        // XComponentLoader provides ability to load components
-        return qi(XComponentLoader.class, xDesktop);
-    } // end of loadOffice()
-
-    public static boolean dispatchCmd(String cmd) {
-        return dispatchCmd(xDesktop.getCurrentFrame(), cmd, null);
     }
 
-    public static boolean dispatchCmd(String cmd, PropertyValue[] props) {
-        return dispatchCmd(xDesktop.getCurrentFrame(), cmd, props);
-    }
+    private static void startOffice() {
 
-    public static boolean dispatchCmd(XFrame frame, String cmd, PropertyValue[] props) {
-        // cmd does not include the ".uno:" substring; e.g. pass "Zoom" not ".uno:Zoom"
-
-        XDispatchHelper helper = createInstanceMCF(XDispatchHelper.class, "com.sun.star.frame.DispatchHelper");
-        if (helper == null) {
-            System.out.println("Could not create dispatch helper for command " + cmd);
-            return false;
-        }
+        System.out.println("Creating libreoffice process");
 
         try {
-            XDispatchProvider provider = qi(XDispatchProvider.class, frame);
+            String[] cmd = new String[] {
+                    "libreoffice",
+                    "-accept=socket,host=localhost,port=" + SOCKET_PORT + ";urp;" };
 
-            /*
-             * returns failure even when the event works (?), and an illegal value when the dispatch actually does fail
-             */
-            /*
-             * DispatchResultEvent res = (DispatchResultEvent) helper.executeDispatch(provider, (".uno:" + cmd), "", 0, props); if (res.State ==
-             * DispatchResultState.FAILURE) System.out.println("Dispatch failed for \"" + cmd + "\""); else if (res.State == DispatchResultState.DONTKNOW)
-             * System.out.println("Dispatch result unknown for \"" + cmd + "\"");
-             */
-            helper.executeDispatch(provider, (cmd), "", 0, props);
-            return true;
-        } catch (java.lang.Exception e) {
-            System.out.println("Could not dispatch \"" + cmd + "\":\n  " + e);
+            Process p = Runtime.getRuntime().exec(cmd);
+
+            if (p != null) {
+                try {
+                    Thread.sleep(5000);
+                } catch (Exception e) {
+                    // ignored
+                }
+            }
+
+            System.out.println("Done");
+            System.exit(0);
+
+        } catch (Exception e) {
+            System.err.println("Failed to create headless libreoffice" + e);
+            e.printStackTrace(System.err);
+            System.exit(1);
         }
-        return false;
-    } // end of dispatchCmd()
+    }
+
+    private static void usage() {
+        System.out.println("Usage: [ startoffice | startsession | stopsession ]");
+        System.exit(1);
+    }
 
     public static void main(String[] args) {
 
-        try {
-            connectToOffice();
-
-            System.out.println("remote ServiceManager is available");
-            String[] services = mcFactory.getAvailableServiceNames();
-
-            /*
-             * System.out.println("Available services:");
-             * 
-             * for (String s : services) {
-             * 
-             * if (s != null) { System.out.println(" " + s); } }
-             */
-            dispatchCmd("service:com.resoftlabs.Inputlog?actionStop");
-
-        } catch (Exception e) {
-            System.out.println("Failed " + e);
-            e.printStackTrace();
-
+        if (args.length != 1) {
+            usage();
         }
 
-        System.out.println("Done");
-    }
+        String arg = args[0];
 
-    /*
-     * public static void main(String[] args) {
-     * 
-     * System.out.println("Starting test");
-     * 
-     * try { // get the remote office component context XComponentContext context = Bootstrap.bootstrap();
-     * 
-     * System.out.println("Connected to a running office ...");
-     * 
-     * XMultiComponentFactory service = context.getServiceManager();
-     * 
-     * if (service != null) { System.out.println("remote ServiceManager is available");
-     * 
-     * String[] services = service.getAvailableServiceNames();
-     * 
-     * System.out.println("Available services:");
-     * 
-     * for (String s : services) {
-     * 
-     * if (s != null) { System.out.println(" " + s); } } } else { System.out.println("remote ServiceManager is NOT available"); }
-     * 
-     * } catch (Exception e) { System.out.println("Failed " + e); e.printStackTrace();
-     * 
-     * }
-     * 
-     * System.out.println("Done"); }
-     */
+        if ("startoffice".equals(arg)) {
+            startOffice();
+        } else if ("startsession".equals(arg)) {
+            dispatch("service:com.resoftlabs.Inputlog?actionStart");
+        } else if ("stopsession".equals(arg)) {
+            dispatch("service:com.resoftlabs.Inputlog?actionStop");
+        } else {
+            usage();
+        }
+    }
 }
