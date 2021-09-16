@@ -13,7 +13,7 @@ import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
-public class Main2 {
+public class Main {
 
     private static final int SOCKET_PORT = 2002;
 
