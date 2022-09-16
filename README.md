@@ -1,6 +1,6 @@
-# LibreOffice-external
+# Inputlog-LibreOffice-extension external application example
 
-Simple example standalone application capable of doing these things (in this order): 
+An example standalone application capable of doing these things (in this order): 
 
 - Start a libreoffice with the command line required to allow remote access
 - Start a logging session using this libreoffice
@@ -8,6 +8,7 @@ Simple example standalone application capable of doing these things (in this ord
 
 ## Compiling and running
 
+- install Java JDK (https://www.oracle.com/java/technologies/downloads/), Gradle (https://gradle.org/install/) and LibreOffice SDK (https://api.libreoffice.org/docs/install.html)
 - checkout the code
 - compile using gradle: `./gradlew build`
 
@@ -34,7 +35,6 @@ This should start a writer session with logging.
 `java -cp "./lib/*" test.Main stopsession`
 
 This should stop the writer session, ask for notes, etc.
-
 
 ## Available dispacth commands in Inputlog-LibreOffice-extension
 
