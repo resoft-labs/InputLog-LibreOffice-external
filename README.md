@@ -36,6 +36,44 @@ This should start a writer session with logging.
 This should stop the writer session, ask for notes, etc.
 
 
+## Available dispacth commands in Inputlog-LibreOffice-extension
+
+### actionStart
+
+Starts the recording.
+
+Example usage:
+```
+dispatch("service:com.resoftlabs.Inputlog?actionStart");
+```
+
+### actionStop
+
+Stops the recording.
+
+Example usage:
+```
+dispatch("service:com.resoftlabs.Inputlog?actionStop");
+```
+
+### actionConfigure
+
+Shows the configure dialog.
+
+Example usage:
+```
+dispatch("service:com.resoftlabs.Inputlog?actionConfigure");
+```
+
+### actionHelp
+
+Opens the help page in webbrowser.
+
+Example usage:
+```
+dispatch("service:com.resoftlabs.Inputlog?actionHelp");
+```
+
 ## Useful resources
 - LibreOffice Developer's Guide - https://wiki.documentfoundation.org/Documentation/DevGuide
 - Developer's Guide Examples - https://api.libreoffice.org/examples/DevelopersGuide/examples.html
