@@ -36,4 +36,10 @@ This should start a writer session with logging.
 This should stop the writer session, ask for notes, etc.
 
 
-
+## Useful resources
+- LibreOffice Developer's Guide - https://wiki.documentfoundation.org/Documentation/DevGuide
+- Developer's Guide Examples - https://api.libreoffice.org/examples/DevelopersGuide/examples.html
+- API examples - https://api.libreoffice.org/examples/examples.html
+- Writing UNO Components - https://wiki.documentfoundation.org/Documentation/DevGuide/Writing_UNO_Components
+- DispatchCommands - https://wiki.documentfoundation.org/Development/DispatchCommands
+- Spreadsheet Example written in C# - https://api.libreoffice.org/examples/CLI/CSharp/Spreadsheet/
