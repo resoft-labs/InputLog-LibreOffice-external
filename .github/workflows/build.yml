@@ -15,15 +15,17 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+        java: [ 14, 15, 17 ]
     runs-on: ${{ matrix.os }} 
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK 15
+    - name: Set up JDK
       uses: actions/setup-java@v3
       with:
-        java-version: '11'
-        distribution: 'temurin'
+        java-version: ${{ matrix.java }}
+        java-package: jdk
+        architecture: x64
     - name: Update apt cache
       run: sudo apt-get update        
     - name: Install dependencies
