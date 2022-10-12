@@ -43,7 +43,7 @@ jobs:
         java --version
         which gradle
         gradle --version        
-        ./gradlew --version
+        #./gradlew --version
     - name: List before build
       run: |
         pwd
