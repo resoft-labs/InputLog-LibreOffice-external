@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        java: [11, 16, 17, 18, 19]        
+        java: [ 16, 17, 18, 19]        
     runs-on: ${{ matrix.os }} 
 
     steps:
@@ -43,14 +43,12 @@ jobs:
         java --version
         which gradle
         gradle --version        
-        #./gradlew --version
     - name: List before build
       run: |
         pwd
         ls -asl            
     - name: Build
       run: |
-        #./gradlew build
         gradle build
     - name: List after build
       run: |
