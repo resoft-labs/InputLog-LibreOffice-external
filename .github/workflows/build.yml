@@ -23,9 +23,7 @@ jobs:
     - name: Set up Java
       uses: actions/setup-java@v1
       with:
-        java-version: ${{ matrix.java }}
-        java-package: jdk
-        architecture: x64      
+        java-version: ${{ matrix.java }} 
     - name: Update apt cache
       run: sudo apt-get update        
     - name: Install dependencies
