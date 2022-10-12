@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        java: [ 14, 15, 17 ]
+        java: [ 11.0.3, 14, 15, 17, 18-ea ]
     runs-on: ${{ matrix.os }} 
 
     steps:
@@ -26,6 +26,8 @@ jobs:
         java-version: ${{ matrix.java }}
         java-package: jdk
         architecture: x64
+        distribution: 'zulu'
+        cache: maven        
     - name: Update apt cache
       run: sudo apt-get update        
     - name: Install dependencies
