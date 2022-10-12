@@ -29,8 +29,12 @@ jobs:
       run: sudo apt-get update        
     - name: Install dependencies
       run: sudo apt-get install -y libreoffice-dev
-#     - name: Set up Gradle
-#       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+    - name: Remove local gradle
+      run: |
+        pwd
+        rm -rfv gradle
+        rm -rfv gradlew        
+        rm -rfv gradlew.bat
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
     - name: Show versions
