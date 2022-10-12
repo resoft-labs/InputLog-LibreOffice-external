@@ -6,21 +6,30 @@ An example standalone application capable of doing these things (in this order):
 - Start a logging session using this libreoffice
 - Stop this logging session
 
-## Compiling and running
+## Compiling
 
-- install Java JDK (https://www.oracle.com/java/technologies/downloads/), Gradle (https://gradle.org/install/) and LibreOffice SDK (https://api.libreoffice.org/docs/install.html)
-- checkout the code
-- compile using gradle: `./gradlew build`
+1. Install the following dependencies
+    - Java JDK (https://www.oracle.com/java/technologies/downloads/)
+    - Gradle (https://gradle.org/install/)
+    - LibreOffice SDK (https://api.libreoffice.org/docs/install.html)
+1. checkout the code
+1. compile using gradle: `./gradlew build`
 
-This should result in all necessary jars ending up in `lib`.
+This should result in all necessary jars ending up in `lib` folder.
 
-Run like this: 
+See the output of [this action](https://github.com/resoft-labs/InputLog-LibreOffice-external/actions/runs/3233168697/jobs/5294673431) for an example.
+
+## Running
+
+You can run the compiled code like this: 
 
 `java -cp "./lib/*" test.Main`
 
 This should print the usage: 
 
+```text
     Usage: [ startoffice | startsession | stopsession ]
+```
 
 Next try the following: 
 
