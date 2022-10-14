@@ -29,7 +29,7 @@ jobs:
       run: sudo apt-get update        
     - name: Install dependencies
       run: sudo apt-get install -y libreoffice-dev libreoffice libreoffice-dev
-        libatk-wrapper-java libatk-wrapper-java-jni liblibreoffice-java libunoloader-java
+        libatk-wrapper-java libatk-wrapper-java-jni libunoloader-java
     - name: Remove local gradle
       run: |
         pwd
