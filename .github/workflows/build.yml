@@ -50,6 +50,7 @@ jobs:
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
       with:
+        gradle-version: 6.5
         arguments: build --scan     
     - name: Show gradle version
       run: |
