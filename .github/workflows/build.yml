@@ -46,6 +46,8 @@ jobs:
       run: |
         which gradle
         gradle --version
+        which gradlew
+        gradlew --version        
     - name: Show libreOffice version
       run: |
         which libreoffice
