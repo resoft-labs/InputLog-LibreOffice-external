@@ -34,8 +34,6 @@ jobs:
       run: |
         pwd
         rm -rfv gradle
-        rm -rfv gradlew        
-        rm -rfv gradlew.bat
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
     - name: Show java version
@@ -46,8 +44,6 @@ jobs:
       run: |
         which gradle
         gradle --version
-        which gradlew
-        gradlew --version        
     - name: Show libreOffice version
       run: |
         which libreoffice
@@ -58,7 +54,7 @@ jobs:
         ls -asl            
     - name: Build
       run: |
-        gradle build
+        ./gradlew build
     - name: List after build
       run: |
         pwd
