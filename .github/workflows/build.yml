@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        java: [ 16, 17, 18, 19]        
+        java: [ 17]        
     runs-on: ${{ matrix.os }} 
 
     steps:
@@ -23,38 +23,41 @@ jobs:
     - name: Set up Java ${{ matrix.java }}
       uses: actions/setup-java@v3
       with:
-        distribution: 'temurin'
         java-version: ${{ matrix.java }}
+        distribution: 'adopt'
+    - name: Show java version
+      run: |
+        which java
+        java --version        
     - name: Update apt cache
       run: sudo apt-get update        
     - name: Install dependencies
       run: sudo apt-get install -y --quiet libreoffice-dev libreoffice libreoffice-dev
         libatk-wrapper-java libatk-wrapper-java-jni libunoloader-java
+    - name: Show libreOffice version
+      run: |
+        which libreoffice
+        libreoffice --version        
     - name: Remove local gradle
       run: |
         pwd
         rm -rfv gradle
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-    - name: Show java version
-      run: |
-        which java
-        java --version
-    - name: Show gradle version
-      run: |
-        which gradle
-        gradle --version
-    - name: Show libreOffice version
-      run: |
-        which libreoffice
-        libreoffice --version
+        rm -rfv gradlew gradlew.bat
     - name: List before build
       run: |
         pwd
         ls -asl            
-    - name: Build
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: build --scan     
+    - name: Show gradle version
       run: |
-        ./gradlew build
+        which gradle
+        gradle --version        
+#     - name: Build
+#       run: |
+#         ./gradlew build
     - name: List after build
       run: |
         pwd
