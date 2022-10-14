@@ -28,7 +28,8 @@ jobs:
     - name: Update apt cache
       run: sudo apt-get update        
     - name: Install dependencies
-      run: sudo apt-get install -y libreoffice-dev
+      run: sudo apt-get install -y libreoffice-dev libreoffice libreoffice-dev
+        libatk-wrapper-java libatk-wrapper-java-jni liblibreoffice-java libunoloader-java
     - name: Remove local gradle
       run: |
         pwd
@@ -37,12 +38,18 @@ jobs:
         rm -rfv gradlew.bat
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
-    - name: Show versions
+    - name: Show java version
       run: |
         which java
         java --version
+    - name: Show gradle version
+      run: |
         which gradle
-        gradle --version        
+        gradle --version
+    - name: Show libreOffice version
+      run: |
+        which libreoffice
+        libreoffice --version
     - name: List before build
       run: |
         pwd
